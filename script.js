@@ -18,17 +18,26 @@ let API_KEY = '';
 // Check API connectivity
 async function checkApiConnectivity() {
     try {
-        const response = await fetch('https://ai-prompt-backend.vercel.app/api/health');
+        // Add mode: 'cors' explicitly to ensure CORS request is made properly
+        const response = await fetch('https://ai-prompt-backend.vercel.app/api/health', {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
         if (response.ok) {
             const data = await response.json();
             console.log("API server is running:", data);
             return true;
         } else {
-            console.warn("API server is not responding correctly");
+            console.warn("API server not responding correctly. Status:", response.status);
             return false;
         }
     } catch (error) {
         console.warn("Could not connect to API server:", error);
+        console.log("If this is a CORS error, check that the backend CORS configuration includes your frontend domain");
         return false;
     }
 }
@@ -481,8 +490,11 @@ async function getPromptFeedback(scenario, difficulty, userPrompt) {
             // Call the backend API
             const response = await fetch('https://ai-prompt-backend.vercel.app/api/analyze', {
                 method: 'POST',
+                mode: 'cors',  // Explicitly set CORS mode
+                cache: 'no-cache', // Don't use cached responses
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({
                     scenario,
@@ -493,14 +505,37 @@ async function getPromptFeedback(scenario, difficulty, userPrompt) {
             });
             
             if (!response.ok) {
-                const errorData = await response.json();
-                console.error("API error:", errorData);
-                return { ...generateFallbackFeedback(scenario, difficulty, userPrompt), isFallback: true };
+                try {
+                    const errorData = await response.json();
+                    console.error("API error:", errorData);
+                    return { 
+                        ...generateFallbackFeedback(scenario, difficulty, userPrompt), 
+                        isFallback: true,
+                        error: errorData.error || `API returned status: ${response.status}`
+                    };
+                } catch (jsonError) {
+                    // If we can't parse the error response as JSON
+                    console.error("API error:", response.status, response.statusText);
+                    return { 
+                        ...generateFallbackFeedback(scenario, difficulty, userPrompt), 
+                        isFallback: true,
+                        error: `API error: ${response.status} ${response.statusText}`
+                    };
+                }
             }
             
-            const feedbackData = await response.json();
-            console.log("API feedback:", feedbackData);
-            return feedbackData;
+            try {
+                const feedbackData = await response.json();
+                console.log("API feedback:", feedbackData);
+                return feedbackData;
+            } catch (parseError) {
+                console.error("Error parsing API response:", parseError);
+                return {
+                    ...generateFallbackFeedback(scenario, difficulty, userPrompt),
+                    isFallback: true,
+                    error: "Failed to parse API response"
+                };
+            }
             
         } catch (apiError) {
             console.error("API connection error:", apiError);
