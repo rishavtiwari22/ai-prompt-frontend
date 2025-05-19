@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Tester</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Prompt Tester</h1>
+            <p>Improve your AI prompt writing skills with real-time feedback</p>
+        </header>
+
+        <section id="level-selection-section" class="active-section">
+            <h2>Choose Your Difficulty Level</h2>
+            <p>Select a difficulty level to practice your prompt writing skills:</p>
+            <div class="difficulty-levels">
+                <div class="level-card" data-level="beginner">
+                    <h3>Beginner</h3>
+                    <p>Simple scenarios with straightforward requirements. Great for those new to prompt engineering.</p>
+                    <button class="select-level-btn" data-level="beginner">Select <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <div class="level-card" data-level="intermediate">
+                    <h3>Intermediate</h3>
+                    <p>More complex scenarios requiring specific details and structured prompts.</p>
+                    <button class="select-level-btn" data-level="intermediate">Select <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <div class="level-card" data-level="advanced">
+                    <h3>Advanced</h3>
+                    <p>Challenging scenarios that demand precise, detailed prompts with careful constraints.</p>
+                    <button class="select-level-btn" data-level="advanced">Select <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <section id="scenario-section">
+            <h2>Step 1: Scenario</h2>
+            <div id="difficulty-badge" class="difficulty-badge">Beginner</div>
+            <p>Here's a scenario to practice writing effective prompts:</p>
+            <div id="scenario-display" class="scenario-display"></div>
+            <button id="new-scenario">Generate New Scenario <i class="fas fa-sync-alt"></i></button>
+            <button id="continue-to-prompts">Continue <i class="fas fa-arrow-right"></i></button>
+        </section>
+
+        <section id="user-prompts-section">
+            <h2>Step 2: Write Your Prompts</h2>
+            <div id="scenario-reminder" class="scenario-reminder"></div>
+            <div class="user-prompt">
+                <h3>Your Prompt</h3>
+                <p class="instruction-text">Based on the scenario above, write an effective prompt that would help an AI generate a good response.</p>
+                <textarea class="user-prompt-input" placeholder="Write your prompt here..."></textarea>
+            </div>
+            <button id="analyze-prompts">Get Feedback <i class="fas fa-chart-bar"></i></button>
+        </section>
+
+        <section id="feedback-section">
+            <h2>Your Prompt Analysis</h2>
+            <div class="feedback-container">
+                <div id="overall-score">
+                    <h3>Overall Score</h3>
+                    <div class="score-circle">
+                        <span id="total-score">0</span>/10
+                    </div>
+                </div>
+                <div id="feedback-details">
+                    <h3>Detailed Feedback</h3>
+                    <div id="feedback-content"></div>
+                </div>
+                <div id="skill-ratings">
+                    <h3>Skill Breakdown</h3>
+                    <div class="skill-bars"></div>
+                </div>
+                <div id="improvement-tips">
+                    <h3>Tips for Improvement</h3>
+                    <ul id="tips-list"></ul>
+                </div>
+                <div id="example-prompts">
+                    <h3>Example Better Prompts</h3>
+                    <div id="better-prompts"></div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button id="try-again">Try Another Scenario <i class="fas fa-redo"></i></button>
+                <button id="change-difficulty">Change Difficulty <i class="fas fa-sliders-h"></i></button>
+            </div>
+        </section>
+
+        <div id="api-notification" class="api-notification">
+            <p>This app requires a Gemini API key to analyze prompts. 
+               <button id="show-api-settings">Configure API Key</button> or 
+               <button id="use-fallback">Continue with Basic Features</button></p>
+        </div>
+
+        <div id="loader" class="hidden">
+            <div class="loader-spinner"></div>
+            <p>Processing your request...</p>
+        </div>
+    </div>
+
+    <script src="scenarios.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedApiKey = localStorage.getItem('geminiApiKey');
+            const apiNotification = document.getElementById('api-notification');
+            
+            if (!savedApiKey) {
+                apiNotification.style.display = 'block';
+                document.getElementById('show-api-settings').addEventListener('click', function() {
+                    document.getElementById('settings-button').click();
+                });
+                document.getElementById('use-fallback').addEventListener('click', function() {
+                    apiNotification.style.display = 'none';
+                });
+            } else {
+                apiNotification.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
