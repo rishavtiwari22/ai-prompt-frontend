@@ -373,6 +373,13 @@ button:hover {
     }
 }
 
+.select-btn{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
 /* API Settings modal styles */
 .settings-button {
     position: absolute;
